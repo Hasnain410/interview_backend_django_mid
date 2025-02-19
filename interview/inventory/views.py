@@ -1,11 +1,38 @@
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.views import APIView
-
 from interview.inventory.models import Inventory, InventoryLanguage, InventoryTag, InventoryType
 from interview.inventory.schemas import InventoryMetaData
 from interview.inventory.serializers import InventoryLanguageSerializer, InventorySerializer, InventoryTagSerializer, InventoryTypeSerializer
+from datetime import datetime
+from rest_framework.generics import ListAPIView
+from rest_framework import status
+from rest_framework.exceptions import APIException
+from datetime import datetime
 
+
+
+class InventoryAfterDateView(ListAPIView):
+    serializer_class = InventorySerializer
+    
+    def get_queryset(self):
+        date_str = self.request.query_params.get('created_after')
+        
+        if not date_str:
+            raise APIException(
+                detail="Missing created_after parameter",
+                code=status.HTTP_400_BAD_REQUEST
+            )
+            
+        try:
+            target_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        except ValueError:
+            raise APIException(
+                detail="Wrong date format, use YYYY-MM-DD",
+                code=status.HTTP_400_BAD_REQUEST
+            )
+            
+        return Inventory.objects.filter(created_at__date__gt=target_date)
 
 class InventoryListCreateView(APIView):
     queryset = Inventory.objects.all()

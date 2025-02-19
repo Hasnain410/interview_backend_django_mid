@@ -39,7 +39,9 @@ class Inventory(NameModel, TimestampedModel, models.Model):
         related_name='inventories'
     )
     tags = models.ManyToManyField(InventoryTag, related_name='inventories')
+    name = models.CharField(max_length=255)
     metadata = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
         verbose_name_plural = 'Inventories'
