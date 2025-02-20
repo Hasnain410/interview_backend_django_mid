@@ -46,8 +46,6 @@ class OrdersByDateRangeView(APIView):
                 status=400
             )
         
-        # Filter orders where the order's start_date is on/after the provided start_date
-        # and the embargo_date is on/before the provided embargo_date.
         orders = Order.objects.filter(start_date__gte=start_date, embargo_date__lte=embargo_date)
         
         serializer = OrderSerializer(orders, many=True)
